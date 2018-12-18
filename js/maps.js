@@ -201,36 +201,36 @@ coordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
 // ##### MAIN FUNCTION #####
 function load() {
     // #### Initialise map ####
-	// ## Set up div for tiles - but since we use overlays, consider replacing this entirely? ##
+    // ## Set up div for tiles - but since we use overlays, consider replacing this entirely? ##
     var div = document.getElementById("map-canvas");
 
     if ( div == null) {return;}
     if (window.innerWidth) {
         // div.style.width        = (window.innerWidth - 20) + "px";
-		// div.style.height       = (window.innerHeight - 30) + "px";
-		div.style.width           = (window.innerWidth) + "px";
+        // div.style.height       = (window.innerHeight - 30) + "px";
+        div.style.width           = (window.innerWidth) + "px";
         div.style.height          = (window.innerHeight ) + "px";
         // div.style.backgroundImage = 'url(img/default.jpg)';
         div.style.backgroundImage = "url('img/default.jpg')";
     } else {
         // div.style.width        = (document.documentElement.clientWidth - 20) + "px";
-		// div.style.height       = (document.documentElement.clientHeight - 30) + "px";
-		div.style.width           = (document.documentElement.clientWidth) + "px";
+        // div.style.height       = (document.documentElement.clientHeight - 30) + "px";
+        div.style.width           = (document.documentElement.clientWidth) + "px";
         div.style.height          = (document.documentElement.clientHeight) + "px";
         // ## This may not be the best method but it works. Consider using the proper image method. ##
         // div.style.backgroundImage = 'url(img/default.jpg)';
         div.style.backgroundImage = "url('img/default.jpg')";
-	}
+    }
 
-	// ## This is legacy v2 code left here for development information only: consider ##
-	// ## removing when image method complete (see previous comment). ##
-	// var tilelayers = [new GTileLayer(copyCollection, 5, 9)];
-	// tilelayers[0].getTileUrl = function CustomGetTileUrl(a,b){
-	// return "default.jpg";
-	//}
+    // ## This is legacy v2 code left here for development information only: consider ##
+    // ## removing when image method complete (see previous comment). ##
+    // var tilelayers = [new GTileLayer(copyCollection, 5, 9)];
+    // tilelayers[0].getTileUrl = function CustomGetTileUrl(a,b){
+    //     return "default.jpg";
+    // }
 
-	// ## use the index labels in xlocations to create the list of world centres for maps ##
-	mapTypesCount = 0;
+    // ## use the index labels in xlocations to create the list of world centres for maps ##
+    mapTypesCount = 0;
     for (key in xlocations) {
         ++mapTypesCount;
         mapTypes.push(key);
@@ -240,43 +240,51 @@ function load() {
     var mapOptions = {
         zoom: zoomStart,
         center: latLng,
+        disableDefaultUI: false,
         streetViewControl: false,
         // mapTypeId: google.maps.MapTypeId.ROADMAP, // can be useful for testing
+        zoomControl: true,
+        zoomControlOptions: {
+            // style: google.maps.ZoomControlStyle.SMALL,
+            // position: google.maps.ControlPosition.LEFT_CENTER
+        },
         mapTypeControlOptions: {
+            // style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
             // mapTypeIds: ['world1', 'world2', google.maps.MapTypeId.ROADMAP]
             // for reference, old hard-coded mapTypeIds
             mapTypeIds: mapTypes
         }
     };
 
-	// ## Initialise map ##
-	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    // ## Initialise map ##
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-    // Fix by djphil (01/01/2017)
-    // keep the next div transparent in order to can see the custom background image
-	var nextdiv = div.firstChild;
-	nextdiv.style.backgroundColor = "transparent";
+    // Fix by djphil (01/01/2018)
+    // keep the next div color #1d475f in order to can see the custom background image
+    var nextdiv = div.firstChild;
+	// nextdiv.style.backgroundColor = "transparent";
+    nextdiv.style.backgroundColor = "#1d475f";
 
-	// ## New method of setting mapTypeIds from user settings ##
-	for (i = 0; i < mapTypesCount; ++i) {
+    // ## New method of setting mapTypeIds from user settings ##
+    for (i = 0; i < mapTypesCount; ++i) {
         map.mapTypes.set(mapTypes[i], new plainMapType(mapCentreNames[i]));
-	}
-	map.setMapTypeId(defaultMap);
+    }
+    map.setMapTypeId(defaultMap);
 
-	// #### Fetch region data on initialise ####
-	var request = getHTTPObject();
-	if (request) {
+    // #### Fetch region data on initialise ####
+    var request = getHTTPObject();
+    if (request) {
         request.onreadystatechange = function() {
-		    parseMapResponse(request,map);
-		};
-		// request.open("GET","inc/map.php", false);
+            parseMapResponse(request,map);
+        };
+        // request.open("GET","inc/map.php", false);
         request.open("GET","inc/map.php", true);
-		request.send(null);
-	}
+        request.send(null);
+    }
 
-	// ## Listener for re-initialising map on map type change ##
-	// This resets xstart, ystart and re-draws the tiles for a different map
-	google.maps.event.addListener(map, 'maptypeid_changed', function(event) 
+    // ## Listener for re-initialising map on map type change ##
+    // This resets xstart, ystart and re-draws the tiles for a different map
+    google.maps.event.addListener(map, 'maptypeid_changed', function(event)
     {
         // this removes the marker and infoWindow for the old world centre
         infoWindow.close(); marker.setMap(null);
@@ -466,20 +474,20 @@ function parseMapResponse(request,map) {
 
             if (__items==null) {return;}
 
-			for (var i = 0; i < __items.length; i++) {
-    			if (__items[i].nodeType == 1){
+            for (var i = 0; i < __items.length; i++) {
+                if (__items[i].nodeType == 1){
                     var xmluuid       = __items[i].getElementsByTagName("Uuid")[0].firstChild.nodeValue;
                     var xmlregionname = __items[i].getElementsByTagName("RegionName")[0].firstChild.nodeValue;
                     var xmllocX       = __items[i].getElementsByTagName("LocX")[0].firstChild.nodeValue;
                     var xmllocY       = __items[i].getElementsByTagName("LocY")[0].firstChild.nodeValue;
 
-					// Added to get map texture from simulator
-					// index.php?method=regionImageUUID
-					var xmlport       = __items[i].getElementsByTagName("ServerPort")[0].firstChild.nodeValue;
-					var xmlip         = __items[i].getElementsByTagName("ServerIP")[0].firstChild.nodeValue;
-					var xmluri        = __items[i].getElementsByTagName("ServerURI")[0].firstChild.nodeValue;
+                    // Added to get map texture from simulator
+                    // index.php?method=regionImageUUID
+                    var xmlport       = __items[i].getElementsByTagName("ServerPort")[0].firstChild.nodeValue;
+                    var xmlip         = __items[i].getElementsByTagName("ServerIP")[0].firstChild.nodeValue;
+                    var xmluri        = __items[i].getElementsByTagName("ServerURI")[0].firstChild.nodeValue;
 
-    				// ## Rewritten code for getting varregion sizes ##
+                    // ## Rewritten code for getting varregion sizes ##
                     for (key in xlocations) {
                         if (xlocations[key] == xmllocX && ylocations[key] == xmllocY) {
                             xsizes[key] = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue;
@@ -487,7 +495,7 @@ function parseMapResponse(request,map) {
                         }
                     }
 
-					sizeX = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue; 
+                    sizeX = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue;
                     sizeY = __items[i].getElementsByTagName("SizeY")[0].firstChild.nodeValue;
 
 					// ## End of new code - following old line left for information, moved below ##
@@ -520,8 +528,8 @@ function parseMapResponse(request,map) {
                             // This is kept to enable compatibility with v2 code using UUIDs without dashes
                             if (filenames == "uuid-no-dashes")
                             {
-                                var rx=new RegExp("(-)", "g");
-                                xmluuid = xmluuid.replace(rx,"");
+                                var rx = new RegExp("(-)", "g");
+                                xmluuid = xmluuid.replace(rx, "");
                             }
 			  
                             var groundOverlayOptions = {map: map, clickable: true, opacity: 1.0};
@@ -550,6 +558,12 @@ function parseMapResponse(request,map) {
                             else if (filenames == "img")
                             {
                                 groundoverlay = 'img/' + opensimFilename;
+                            }
+
+                            // Use img naming pattern for jpg names
+                            else if (filenames == "bin")
+                            {
+                                // groundoverlay = 'D:/opensim/owigrid/bin/maptiles/' + opensimFilename;
                             }
 
                             layer[layerCount] = new google.maps.GroundOverlay(groundoverlay, boundaries, groundOverlayOptions);
@@ -590,18 +604,18 @@ function getRegionInfos(x,y) {
 
                 response  = "<br />";
                 response += "<table class='table table-striped table-condensed tooltips'>";
-				response += "<tr class='info active'>";
-				response += "<td><strong>" + xmlregionname + "</strong></td>";
-				response += "<td></td>";
+                response += "<tr class='info active'>";
+                response += "<td><strong>" + xmlregionname + "</strong></td>";
                 response += "<td></td>";
-				response += "<td><i class='glyphicon glyphicon-th pull-right' id='name'></i></td>";
-				response += "</tr>";
+                response += "<td></td>";
+                response += "<td><i class='glyphicon glyphicon-th pull-right' id='name'></i></td>";
+                response += "</tr>";
 
-				response += "<tr>";
-				response += "<td>Coordinate: </td>";
+                response += "<tr>";
+                response += "<td>Coordinate: </td>";
                 response += "<td></td>";
                 response += "<td>" + "<span class='label label-default label-danger' id='locX'>X: " + xmllocX + "</span></td>";
-				response += "<td>" + "<span class='label label-default label-success' id='locY'>Y: " + xmllocY + "</span></td>";
+                response += "<td>" + "<span class='label label-default label-success' id='locY'>Y: " + xmllocY + "</span></td>";
                 response += "</tr>";
 
                 if (showUUID == "true")
@@ -617,47 +631,47 @@ function getRegionInfos(x,y) {
                 var portstring2 = "";
 
                 if (port80 == 1) {
-				    portstring = ":" + portnumber;
+                    portstring = ":" + portnumber;
                     portstring2 = "|" + portnumber;
-				}
+                }
 
-				response += "<tr>";
+                response += "<tr>";
 
-				// For local URL
+                // For local URL
                 xmlregionname = xmlregionname.replace("+", " ");
 
-				response += "<td>";
+                response += "<td>";
                 response += "<a class=\"btn btn-primary btn-xs \" href=\"secondlife://" + xmlregionname + "/" + xjump + "/" + yjump + "/128/\">";
-				response += "<i class='glyphicon glyphicon-map-marker'></i>";
-				response += " TP Local</a>";
-				response += "</td>";
+                response += "<i class='glyphicon glyphicon-map-marker'></i>";
+                response += " TP Local</a>";
+                response += "</td>";
 
-				response += "<td>";
+                response += "<td>";
                 response += "<a class=\"btn btn-info btn-xs \" href=\"hop://" + hgdomains[map.getMapTypeId()] + portstring + "/" + xmlregionname + "/" + xjump + "/" + yjump + "/128/\">";
-				response += "<i class='glyphicon glyphicon-map-marker'></i>";
-				response += " TP Hop</a>";
-				response += "</td>";
+                response += "<i class='glyphicon glyphicon-map-marker'></i>";
+                response += " TP Hop</a>";
+                response += "</td>";
 
-				response += "<td>";
+                response += "<td>";
                 response += "<a class=\"btn btn-success btn-xs s\" href=\"secondlife://" + hgdomains[map.getMapTypeId()] + portstring + "/" + xmlregionname + "/"+xjump+"/"+yjump+"/128/\">";
-				response += "<i class='glyphicon glyphicon-map-marker'></i>";
-				response += " TP HG</a>";
-				response += "</td>";
+                response += "<i class='glyphicon glyphicon-map-marker'></i>";
+                response += " TP HG</a>";
+                response += "</td>";
 
-				// For V3 HG URL
+                // For V3 HG URL
                 xmlregionname = xmlregionname.replace(" ", "+");
 
-				response += "<td>";
+                response += "<td>";
                 response += "<a class=\"btn btn-warning btn-xs \" href=\"secondlife://http|!!" + hgdomains[map.getMapTypeId()] + portstring2 + "+" + xmlregionname + "/" + xjump + "/" + yjump + "/128/\">"
-				response += "<i class='glyphicon glyphicon-map-marker'></i>";
-				response += " TP HG V3</a>";
-				response += "</td>";
-				response += "</tr>";
+                response += "<i class='glyphicon glyphicon-map-marker'></i>";
+                response += " TP HG V3</a>";
+                response += "</td>";
+                response += "</tr>";
 
                 if (xjump > 255 || yjump > 255) {
                     response += "</table>";
-					response += "<table class='table table-striped table-condensed'>";
-					response += "<tr><td>Viewer may restrict login within SE 256x256 corner </td></tr>";
+                    response += "<table class='table table-striped table-condensed'>";
+                    response += "<tr><td>Viewer may restrict login within SE 256x256 corner </td></tr>";
                     response += "<tr><td>of larger regions in OpenSim/WhiteCore/Aurora</td></tr>";
                 }
                 response += "</table>";
@@ -721,63 +735,71 @@ function updateCopyrights() {
 // #### Function to load copyright collections for custom map types ####
 function loadCopyrightCollections(mapTypesCount) {
     var collection = new Array();
-	if (copyrightEndYear == 0) {
-	    copyrightEndYear = String(new Date().getFullYear()).substr(2)
-	}
+    if (copyrightEndYear == 0) {
+        copyrightEndYear = String(new Date().getFullYear()).substr(2)
+    }
 
-	var copyrightEndYearString = "";
-	if (copyrightEndYear != -1) {
+    var copyrightEndYearString = "";
+    if (copyrightEndYear != -1) {
         copyrightEndYearString = + copyrightEndYear.toString();
-	}
-	
-	for (i = 0; i < mapTypesCount; ++i) {
+    }
+
+    for (i = 0; i < mapTypesCount; ++i) {
         // map.mapTypes.set(mapTypes[i], new plainMapType(mapCentreNames[i]));
         collection[i] = new CopyrightCollection('<span class="label label-default">&copy; 2000 - 20' + copyrightEndYearString);
         collection[i].addCopyright(
-	    new Copyright(1, new google.maps.LatLngBounds(
+        new Copyright(1, new google.maps.LatLngBounds(
         new google.maps.LatLng(-90, -179), 
-		new google.maps.LatLng(90, 180)), 
-		0, copyrightNotices[i] + '</span>'));
-		copyrights[mapTypes[i]] = collection[i];
-	}
-}
+        new google.maps.LatLng(90, 180)), 
+        0, copyrightNotices[i] + '</span>'));
+        copyrights[mapTypes[i]] = collection[i];
+    }
+    }
 
-// #### Function to set up Center control ####
-function HomeControl(controlDiv, map) {
-	// ## Set CSS styles for the DIV containing the control ##
-	// Setting padding to 5 px will offset the control
-	// from the edge of the map.
-	controlDiv.style.padding = '5px';
+    // #### Function to set up Center control ####
+    function HomeControl(controlDiv, map) {
+    // ## Set CSS styles for the DIV containing the control ##
+    // Setting padding to 5 px will offset the control
+    // from the edge of the map.
+    controlDiv.style.padding = '0px';
+    controlDiv.style.marginTop = '10px';
+    controlDiv.style.marginRight = '10px';
 
-	// ## Set CSS for the control border ##
-	var controlUI = document.createElement('div');
-	controlUI.style.backgroundColor = 'white';
-	controlUI.style.borderStyle     = 'solid';
-	controlUI.style.borderWidth     = '1px';
-	controlUI.style.cursor          = 'pointer';
-	controlUI.style.textAlign       = 'center';
-	controlUI.title                 = 'Click to set the map to Center';
-	controlDiv.appendChild(controlUI);
+    // ## Set CSS for the control border ##
+    var controlUI = document.createElement('div');
+    controlUI.style.backgroundColor = '#FFFFFF';
+    // controlUI.style.border          = '2px solid #FFFFFF';
+    controlUI.style.borderStyle     = 'solid';
+    controlUI.style.borderColor     = '#FFFFFF';
+    controlUI.style.borderWidth     = '1px';
+    controlUI.style.borderRadius    = '3px';
+    controlUI.style.boxShadow       = '0 2px 6px rgba(0,0,0,.3)';
+    controlUI.style.cursor          = 'pointer';
+    controlUI.style.textAlign       = 'center';
+    controlUI.title                 = 'Click to set the map to Center';
+    controlDiv.appendChild(controlUI);
+        
+    // ## Set CSS for the control interior ##
+    var controlText = document.createElement('div');
+    controlText.style.fontFamily    = 'Arial,sans-serif';
+    controlText.style.fontSize      = '24px';
+    controlText.style.color         = '#888888';
+    controlText.style.paddingLeft   = '7px';
+    controlText.style.paddingRight  = '7px';
+    controlText.style.paddingTop    = '5px';
+    controlText.style.paddingBottom = '2px';
+    // controlText.innerHTML = '<strong>Center<strong>';
+    // screenshot, record, fullscreen
+    controlText.innerHTML = '<i class="glyphicon glyphicon-screenshot"></i>';
+    controlUI.appendChild(controlText);
 
-	// ## Set CSS for the control interior ##
-	var controlText = document.createElement('div');
-	controlText.style.fontFamily    = 'Arial,sans-serif';
-	controlText.style.fontSize      = '11px';
-	controlText.style.paddingLeft   = '4px';
-	controlText.style.paddingRight  = '4px';
-	controlText.style.paddingTop    = '1px';
-	controlText.style.paddingBottom = '1px';
-	controlText.innerHTML           = '<strong>Center<strong>';
-  
-	controlUI.appendChild(controlText);
-
-	// ## Set up the click event listeners ##
-	google.maps.event.addDomListener(controlUI, 'click', function() {
-		// ## New code to offset the centre from xlocation, ylocation ##
-		var xoffset = xoffsets[map.getMapTypeId()];
-		var yoffset = yoffsets[map.getMapTypeId()];
-		map.setCenter(latLng);
-		// Not sure why 184 pixels is right but it is!
-		map.panBy(-xoffset*184, yoffset*184);
-	});
+    // ## Set up the click event listeners ##
+    google.maps.event.addDomListener(controlUI, 'click', function() {
+        // ## New code to offset the centre from xlocation, ylocation ##
+        var xoffset = xoffsets[map.getMapTypeId()];
+        var yoffset = yoffsets[map.getMapTypeId()];
+        map.setCenter(latLng);
+        // Not sure why 184 pixels is right but it is!
+        map.panBy(-xoffset * 184, yoffset * 184);
+    });
 }
