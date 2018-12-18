@@ -756,8 +756,8 @@ function loadCopyrightCollections(mapTypesCount) {
     }
 }
 
-    // #### Function to set up Center control ####
-    function HomeControl(controlDiv, map) {
+// #### Function to set up Center control ####
+function HomeControl(controlDiv, map) {
     // ## Set CSS styles for the DIV containing the control ##
     // Setting padding to 5 px will offset the control
     // from the edge of the map.
