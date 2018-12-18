@@ -754,7 +754,7 @@ function loadCopyrightCollections(mapTypesCount) {
         0, copyrightNotices[i] + '</span>'));
         copyrights[mapTypes[i]] = collection[i];
     }
-    }
+}
 
     // #### Function to set up Center control ####
     function HomeControl(controlDiv, map) {
