@@ -3,8 +3,8 @@ include_once("config.php");
 include_once("mysqli.php");
 
 // Creates XML string and XML document using the DOM 
-$dom    = new DomDocument('1.0', "UTF-8"); 
-$map    = $dom->appendChild($dom->createElement('Map')); 
+$dom = new DomDocument('1.0', "UTF-8"); 
+$map = $dom->appendChild($dom->createElement('Map')); 
 $DbLink = new DB;
 $DbLink->query("SELECT uuid, regionName, serverPort, serverIP, serverURI, locX, locY, sizeX, sizeY FROM ".C_TB_REGIONS);
 

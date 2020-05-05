@@ -16,31 +16,31 @@ var defaultMap = 'world1'; // must be in the lists below, usually the first
 
 var xlocations = {
     "world1": 10000, // primary map centre location (x)
-    "world2": 5000, // secondary map centre location (x)
-    "world3": 1000, // secondary map centre location (x)
+    // "world2": 5000,  // secondary map centre location (x)
+    // "world3": 1000,  // secondary map centre location (x)
     // ... add more lines as required, separated by commas
 };
 
 var ylocations = {
     "world1": 10000, // primary map centre location (y)
-    "world2": 5000, // secondary map centre location (y)
-    "world3": 1000, // secondary map centre location (y)
+    // "world2": 5000,  // secondary map centre location (y)
+    // "world3": 1000,  // secondary map centre location (y)
     // ... add more lines as required, separated by commas, same index labels as above
 };
 
 // ## This is especially useful for large regions e.g. varregions ##
 var xoffsets = { // if required: default is zero
     "world1": 0.0, // primary offset (number of tiles) SE from centre (x)
-    "world2": 0.0, // secondary offset (number of tiles) SE from centre (x)
-    "world3": 0.0, // tertiary offset (number of tiles) SE from centre (x)
+    // "world2": 0.0, // secondary offset (number of tiles) SE from centre (x)
+    // "world3": 0.0, // tertiary offset (number of tiles) SE from centre (x)
     // ... add more lines as required, separated by commas
 };
 
 // ## This is especially useful for large regions e.g. varregions ##
 var yoffsets = { // if required: default is zero
     "world1": 0.0, // primary offset (number of tiles) SE from centre (y)
-    "world2": 0.0, // secondary offset (number of tiles) SE from centre (y)
-    "world3": 0.0,// tertiary offset (number of tiles) SE from centre (y)
+    // "world2": 0.0, // secondary offset (number of tiles) SE from centre (y)
+    // "world3": 0.0, // tertiary offset (number of tiles) SE from centre (y)
     // ... add more lines as required, separated by commas, same index labels as above
 };
 
@@ -48,42 +48,49 @@ var yoffsets = { // if required: default is zero
 var zoomStart;
 var zoomStarts = {
     "world1": 8, // primary zoom start level
-    "world2": 8, // secondary zoom start level
-    "world3": 8, // tertiary zoom start level
+    // "world2": 8, // secondary zoom start level
+    // "world3": 8, // tertiary zoom start level
     // ... add more lines as required, separated by commas
 };
 
 // these will appear on the map control buttons, e.g. names of worlds or arbitrary labels
 var mapCentreNames = [
-    "world1", // primary map centre name of choice
-    "world2", // secondary map centre name of choice
-    "world3", // tertiary secondary map centre name of choice
+    "Home",  // primary map centre name of choice
+    // "world2", // secondary map centre name of choice
+    // "world3", // tertiary secondary map centre name of choice
     // ... add more lines as required, separated by commas
 ];
 
 var copyrightNotices = [ // these may be different for each map, e.g. if for multiple worlds
-    "OpenSimulator 256x256", // primary copyright notice
-    "OpenSimulator 1024x1024", // secondary copyright notice
-    "OpenSimulator 2048x2048", // tertiary copyright notice
+    "OpenSimulator 256x256",   // primary copyright notice
+    // "OpenSimulator 1024x1024", // secondary copyright notice
+    // "OpenSimulator 2048x2048", // tertiary copyright notice
     // ... add more lines as required, separated by commas
 ];
 
 var hgdomains = { // these may be different for each map, e.g. if for multiple worlds
-    "world1": "hg.domaine.com", // primary hypergrid domain
-    "world2": "hg.domaine.com", // secondary hypergrid domain
-    "world3": "hg.domaine.com", // tertiary hypergrid domain
+    // "world1": "domain.com", // primary hypergrid domain
+    // "world2": "domain.com", // secondary hypergrid domain
+    // "world3": "domain.com", // tertiary hypergrid domain
     // .. add more lines as required, separated by commas
 };
 
 var hgports = { // these may be different for each map, e.g. if for multiple worlds
     "world1": "8002", // primary hypergrid port
-    "world2": "8002", // secondary hypergrid port
-    "world3": "8002", // tertiary hypergrid port
+    // "world2": "8002", // secondary hypergrid port
+    // "world3": "8002", // tertiary hypergrid port
     // ... add more lines as required, separated by commas
 };
 
 // Where default port 80 is specified, include explicitly in link (boolean).
-var port80 = 1;
+var port80 = true;
+var freelands = true;
+var hideworlds = false;
+
+// module directory name or http://domain.com/
+var register_url = "../osregister/";
+var register_target = "_blank";
+var register_text = "Register Now, it's Free!";
 
 // 0 = current year, -1 = no end year
 var copyrightStartYear = 2012;
@@ -94,11 +101,20 @@ var copyrightEndYear   = 0;
 // used in [opensim]/bin/maptiles or, though not sure you'd want this, UUIDs with dashes removed. This is left 
 // in to enable compatibility with the v2 code but it is better to use the proper UUID format with dashes retained.
 
-// default is "opensim", otherwise use "uuid" or "uuid-no-dashes" or "img"
-var filenames = "uuid-no-dashes";
+// default is "opensim", otherwise use "uuid" or "uuid-no-dashes" or "img" or "server"
+var filenames = "img";
+
+// For filenames "opensim"
+var robustport = 8002;
+
+// For filenames "bin"
+var binURL = "C:/opensim/bin/";
+
+// Don't change this
+var zeroUUID = "00000000-0000-0000-0000-000000000000";
 
 // Default is "false", setting to "true" will show the region UUID in the infoWindow
-var showUUID = "true";
+var showUUID = true;
 
 // ########## ONLY SOFTWARE DEVELOPERS BELOW THIS LINE ##########
 
@@ -135,13 +151,17 @@ var layerCount = 0;
 
 // ## Set up options for the marker ##
 var markerTitle = "Location";
+// var image = {url: 'img/marger.png'};
+var image = "img/marger.png";
 
 var marker = new google.maps.Marker({
     position: latLng,
     title: markerTitle,
     map: map,
     draggable: true,
+    // animation: google.maps.Animation.BOUNCE,
     animation: google.maps.Animation.DROP,
+    icon: image,
 });
 
 var infoWindow = new google.maps.InfoWindow;
@@ -209,16 +229,15 @@ function load() {
         // div.style.width        = (window.innerWidth - 20) + "px";
         // div.style.height       = (window.innerHeight - 30) + "px";
         div.style.width           = (window.innerWidth) + "px";
-        div.style.height          = (window.innerHeight ) + "px";
-        // div.style.backgroundImage = 'url(img/default.jpg)';
+        div.style.height          = (window.innerHeight) + "px";
         div.style.backgroundImage = "url('img/default.jpg')";
-    } else {
+    }
+    else {
         // div.style.width        = (document.documentElement.clientWidth - 20) + "px";
         // div.style.height       = (document.documentElement.clientHeight - 30) + "px";
         div.style.width           = (document.documentElement.clientWidth) + "px";
         div.style.height          = (document.documentElement.clientHeight) + "px";
         // ## This may not be the best method but it works. Consider using the proper image method. ##
-        // div.style.backgroundImage = 'url(img/default.jpg)';
         div.style.backgroundImage = "url('img/default.jpg')";
     }
 
@@ -240,7 +259,7 @@ function load() {
     var mapOptions = {
         zoom: zoomStart,
         center: latLng,
-        disableDefaultUI: false,
+        disableDefaultUI: hideworlds,
         streetViewControl: false,
         // mapTypeId: google.maps.MapTypeId.ROADMAP, // can be useful for testing
         zoomControl: true,
@@ -275,10 +294,10 @@ function load() {
     var request = getHTTPObject();
     if (request) {
         request.onreadystatechange = function() {
-            parseMapResponse(request,map);
+            parseMapResponse(request, map);
         };
-        // request.open("GET","inc/map.php", false);
-        request.open("GET","inc/map.php", true);
+        // request.open("GET", "inc/map.php", false);
+        request.open("GET", "inc/map.php", true);
         request.send(null);
     }
 
@@ -308,14 +327,15 @@ function load() {
         map.setCenter(latLng);
 
         // Not sure why 184 pixels is right but it is!
-        map.panBy(-xoffset*184, yoffset*184);
+        map.panBy(-xoffset * 184, yoffset * 184);
 
         request = getHTTPObject();
         if (request) {
-            request.onreadystatechange = function(){
+            request.onreadystatechange = function() {
                 parseMapResponse(request, map);
             };
-            request.open("GET","inc/map.php", false);
+            // request.open("GET", "inc/map.php", false);
+            request.open("GET", "inc/map.php", true);
             request.send(null);
         }
     });
@@ -358,34 +378,73 @@ function load() {
 		// ## New code for enabling varregions ##
         var xbigger = (x-xstart);
         var ybigger = (y-ystart);
-        var xtilebigger = (sizeX/256)-1;
-        var ytilebigger = (sizeY/256)-1;
+        var xtilebigger = (sizeX / 256) - 1;
+        var ytilebigger = (sizeY / 256) - 1;
         
 		if (xbigger > 0 && xbigger <= xtilebigger) {
-            xjump = xjump + (xbigger*256);
+            xjump = xjump + (xbigger * 256);
             x = xstart;
         }
         
 		if (ybigger > 0 && ybigger <= ytilebigger) {
-            yjump = yjump + (ybigger*256);
+            yjump = yjump + (ybigger * 256);
             y = ystart;
         }
         // ## End of new code ##
 
 		if (isOutOfBounds(x, y)) {return;}
 
-
         // Show info popup if a region exists
         var content = getRegionInfos(x, y);
-        if (content != "") {
+
+        if (content != "")
+        {
             placeMarker(clickLatLng);
             infoWindow.close();
             infoWindow.setContent(content);
             infoWindow.open(map, marker);
-        } else {
+        }
+
+        // Show info popup if it's a freeland
+        else if (freelands == true)
+        {
+            content += "<table class='table-off table-striped table-condensed tooltips'>";
+            content += "<tr>";
+            content += "<td colspan=\"4\" class=\"heading\"><strong>Free Coordinates!</strong></td>";
+            content += "</tr>";
+
+            content += "<tr>";
+            content += "<tr>";
+            content += "<td>Superficy:</td>";
+            content += "<td>" + "<span class='label label-danger' id='locX'>X:</span> " + sizeX + " m</td>";
+            content += "<td>" + "<span class='label label-success' id='locY'>Y:</span> " + sizeY + " m</td>";
+            content += "<td>" + "<span class='badge' id='superficy'> " + (sizeX * sizeY)+" m²</span></td>";
+            content += "</tr>";
+
+            content += "<td>Coordinate:</td>";
+            content += "<td>" + "<span class='label label-danger' id='locX'>X:</span> " + x + " m</td>";
+            content += "<td>" + "<span class='label label-success' id='locY'>Y:</span> " + y + " m</td>";
+            content += "<td>" + "<span class='badge' id='superficy'> " + ((sizeX * sizeY)/1000.0) + " Km²</span></td>";
+            content += "</tr>";
+
+            content += "<tr>";
+            content += "<td colspan=\"4\">";
+            content += "<a class=\"btn btn-success btn-block\" href=\""+register_url+"\" target=\""+register_target+"\">";
+            content += "<i class='glyphicon glyphicon-ok'></i> " + register_text + "</a>";
+            content += "</td>";
+            content += "</tr>";
+
+            placeMarker(clickLatLng);
+            infoWindow.close();
+            infoWindow.setContent(content);
+            infoWindow.open(map, marker);
+        }
+
+        else
+        {
             infoWindow.close();
             marker.setMap(null);
-        }						 		
+        }
     });
 
     // ## Placeholder for zoom event listener, currently unused ##
@@ -399,13 +458,14 @@ function load() {
     // ## Create div for showing copyrights ##
     copyrightNode = document.createElement('div');
     copyrightNode.id               = 'copyright-control';
-    copyrightNode.style.fontSize   = '12px';
+    copyrightNode.style.fontSize   = '14px';
     copyrightNode.style.fontFamily = 'Arial, sans-serif';
     copyrightNode.style.margin     = '0px 0px -1px 0px';
     copyrightNode.style.whiteSpace = 'nowrap';
     copyrightNode.index            = 0;
-    map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
-  
+    // map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(copyrightNode);
+    map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(copyrightNode);
+    // map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(copyrightNode);
     // Copyright collections
     loadCopyrightCollections(mapTypesCount);
 
@@ -472,10 +532,10 @@ function parseMapResponse(request,map) {
             // FOR TESTING [opensim]/app/google_map/data/map.php ONLY
             // console.log(root);
 
-            if (__items==null) {return;}
+            if (__items == null) {return;}
 
             for (var i = 0; i < __items.length; i++) {
-                if (__items[i].nodeType == 1){
+                if (__items[i].nodeType == 1) {
                     var xmluuid       = __items[i].getElementsByTagName("Uuid")[0].firstChild.nodeValue;
                     var xmlregionname = __items[i].getElementsByTagName("RegionName")[0].firstChild.nodeValue;
                     var xmllocX       = __items[i].getElementsByTagName("LocX")[0].firstChild.nodeValue;
@@ -508,7 +568,7 @@ function parseMapResponse(request,map) {
                     for (var x = (sizeX / 256) - 1; x >= 0; x--)
                     {
                         // has to be backwards to finish on SE corner
-                        for (var y = (sizeX/256)-1; y >= 0; y--)
+                        for (var y = (sizeX / 256)-1; y >= 0; y--)
                         {
                             // messy hack needs tidying later
                             var xmllocXx = parseInt(xmllocX) + x - 10 + xstart; 
@@ -531,7 +591,7 @@ function parseMapResponse(request,map) {
                                 var rx = new RegExp("(-)", "g");
                                 xmluuid = xmluuid.replace(rx, "");
                             }
-			  
+
                             var groundOverlayOptions = {map: map, clickable: true, opacity: 1.0};
                             layerCount++;
 
@@ -539,10 +599,10 @@ function parseMapResponse(request,map) {
 
                             if (filenames == "uuid") { 
                                 // Use UUID format for jpg names
-                                groundoverlay = "img/" + xmluuid + ".jpg";
+                                groundoverlay = "img/regions/" + xmluuid + ".jpg";
                             }
-                            
-                            if (filenames == "uuid-no-dashes") { 
+
+                            else if (filenames == "uuid-no-dashes") { 
                                 // Use UUID no dashes format for regionImage with index.php?method=regionImage" + xmluuid;
                                 groundoverlay = xmluri + "/index.php?method=regionImage" + xmluuid;
                             }
@@ -550,20 +610,30 @@ function parseMapResponse(request,map) {
                             // Use default opensim naming pattern for jpg names
                             else if (filenames == "opensim")
                             {
-                                groundoverlay = "http://" + xmlip + ":" + xmlport + "/" + opensimFilename;
-                                // alert(xmlip+ " " +xmlport + " " + xmluri);
+                                // groundoverlay = "http://" + xmlip + ":" + xmlport + "/" + opensimFilename;
+                                groundoverlay = "http://" + xmlip + ":"+robustport+"/" + opensimFilename;
                             }
 
                             // Use img naming pattern for jpg names
                             else if (filenames == "img")
                             {
-                                groundoverlay = 'img/' + opensimFilename;
+                                groundoverlay = 'img/regions/' + opensimFilename;
+                            }
+
+                            // Use default opensim naming pattern for jpg names
+                            else if (filenames == "server")
+                            {
+                                groundoverlay = 'http://' + hgdomains[map.getMapTypeId()] + ':' + hgports[map.getMapTypeId()] + '/' + opensimFilename;
                             }
 
                             // Use img naming pattern for jpg names
                             else if (filenames == "bin")
                             {
-                                // groundoverlay = 'D:/opensim/owigrid/bin/maptiles/' + opensimFilename;
+                                // Under Construction (Not allowed)
+                                // file:///C:/opensim/bin/maptiles/00000000-0000-0000-0000-000000000000/map-1-1000-1000-objects.jpg
+                                // C:/opensim/bin/maptiles/00000000-0000-0000-0000-000000000000/map-1-1000-1000-objects.jpg
+                                // groundoverlay = "D:/opensim/bin/maptiles/00000000-0000-0000-0000-000000000000/"+opensimFilename;
+                                // groundoverlay = binURL + 'maptiles/' + zeroUUID + '/' + opensimFilename;
                             }
 
                             layer[layerCount] = new google.maps.GroundOverlay(groundoverlay, boundaries, groundOverlayOptions);
@@ -582,7 +652,7 @@ function parseMapResponse(request,map) {
 }
 
 // #### Function to return information for infoWindow ####
-function getRegionInfos(x,y) {
+function getRegionInfos(x, y) {
     if (__items == null) {return;}
     var response = "";
 	for (var i = 0; i < __items.length; i++) {		
@@ -593,6 +663,9 @@ function getRegionInfos(x,y) {
                 var xmluuid       = __items[i].getElementsByTagName("Uuid")[0].firstChild.nodeValue;				
                 var xmlregionname = __items[i].getElementsByTagName("RegionName")[0].firstChild.nodeValue;
 
+                sizeX = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue;
+                sizeY = __items[i].getElementsByTagName("SizeY")[0].firstChild.nodeValue;
+                    
                 // #### These two lines from the old code visually remove dashes from UUIDs: seems unnecessary. ####
                 // var rx = new RegExp("(-)", "g");
                 // xmluuid = xmluuid.replace(rx, "");
@@ -602,27 +675,30 @@ function getRegionInfos(x,y) {
                 //     marker.setTitle("Location: " + xmlregionname +  "/" + xjump + "/" + yjump + "/");
                 // }
 
-                response  = "<br />";
-                response += "<table class='table table-striped table-condensed tooltips'>";
-                response += "<tr class='info active'>";
-                response += "<td><strong>" + xmlregionname + "</strong></td>";
-                response += "<td></td>";
-                response += "<td></td>";
-                response += "<td><i class='glyphicon glyphicon-th pull-right' id='name'></i></td>";
+                response += "<table class='table-off table-striped table-condensed tooltips'>";
+                response += "<tr>";
+                response += "<td colspan=\"4\" class=\"heading\"><strong>" + xmlregionname + "</strong></td>";
+                response += "</tr>";
+
+                response += "<tr>";
+                response += "<td>Superficy: </td>";
+                response += "<td>" + "<span class='label label-danger' id='locX'>X:</span> " + sizeX + " m</td>";
+                response += "<td>" + "<span class='label label-success' id='locY'>Y:</span> " + sizeY + " m</td>";
+                response += "<td>" + "<span class='badge' id='superficy'> " + (sizeX * sizeY)+" m²</span></td>";
                 response += "</tr>";
 
                 response += "<tr>";
                 response += "<td>Coordinate: </td>";
-                response += "<td></td>";
-                response += "<td>" + "<span class='label label-default label-danger' id='locX'>X: " + xmllocX + "</span></td>";
-                response += "<td>" + "<span class='label label-default label-success' id='locY'>Y: " + xmllocY + "</span></td>";
+                response += "<td>" + "<span class='label label-danger' id='locX'>X:</span> " + xmllocX + "</td>";
+                response += "<td>" + "<span class='label label-success' id='locY'>Y:</span> " + xmllocY + "</td>";
+                response += "<td>" + "<span class='badge' id='superficy'> " + ((sizeX * sizeY) / 1000.0)+" Km²</span></td>";
                 response += "</tr>";
 
-                if (showUUID == "true")
+                if (showUUID == true)
                 {
                     response += "<tr>";
                     response += "<td>" + "Region uuid:</td>";
-                    response += "<td colspan='3'>" + "<span class='badge badge-default' id='RegionUuid'>" + xmluuid + "</span></td>";
+                    response += "<td colspan='3'>" + "<span class='' id='RegionUuid'>" + xmluuid + "</span></td>";
                     response += "</tr>";
                 }
 
@@ -630,14 +706,14 @@ function getRegionInfos(x,y) {
                 var portstring  = "";
                 var portstring2 = "";
 
-                if (port80 == 1) {
+                if (port80 == true) {
                     portstring = ":" + portnumber;
                     portstring2 = "|" + portnumber;
                 }
 
                 response += "<tr>";
 
-                // For local URL
+                // For Local URL
                 xmlregionname = xmlregionname.replace("+", " ");
 
                 response += "<td>";
@@ -658,7 +734,7 @@ function getRegionInfos(x,y) {
                 response += " TP HG</a>";
                 response += "</td>";
 
-                // For V3 HG URL
+                // For HG v3 URL
                 xmlregionname = xmlregionname.replace(" ", "+");
 
                 response += "<td>";
@@ -682,7 +758,7 @@ function getRegionInfos(x,y) {
 }
 
 // #### Function to prevent click outside preset bounds - not vital but kept from v2 code ####
-function isOutOfBounds(x,y) {
+function isOutOfBounds(x, y) {
     if (x < xstart - 30 || x > xstart + 30) {return true;}
     if (y < ystart - 30 || y > ystart + 30) {return true;}
     return false;
@@ -746,7 +822,8 @@ function loadCopyrightCollections(mapTypesCount) {
 
     for (i = 0; i < mapTypesCount; ++i) {
         // map.mapTypes.set(mapTypes[i], new plainMapType(mapCentreNames[i]));
-        collection[i] = new CopyrightCollection('<span class="label label-default">&copy; 2000 - 20' + copyrightEndYearString);
+        var CopyrightContent = '<span class="label label-default">&copy; '+copyrightStartYear+ ' - 20' + copyrightEndYearString;
+        collection[i] = new CopyrightCollection(CopyrightContent);
         collection[i].addCopyright(
         new Copyright(1, new google.maps.LatLngBounds(
         new google.maps.LatLng(-90, -179), 
@@ -773,7 +850,7 @@ function HomeControl(controlDiv, map) {
     controlUI.style.borderColor     = '#FFFFFF';
     controlUI.style.borderWidth     = '1px';
     controlUI.style.borderRadius    = '3px';
-    controlUI.style.boxShadow       = '0 2px 6px rgba(0,0,0,.3)';
+    controlUI.style.boxShadow       = '0 2px 6px rgba(0, 0, 0, 0.3)';
     controlUI.style.cursor          = 'pointer';
     controlUI.style.textAlign       = 'center';
     controlUI.title                 = 'Click to set the map to Center';
