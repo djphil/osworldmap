@@ -69,7 +69,7 @@ var copyrightNotices = [ // these may be different for each map, e.g. if for mul
 ];
 
 var hgdomains = { // these may be different for each map, e.g. if for multiple worlds
-    // "world1": "domain.com", // primary hypergrid domain
+    "world1": "domain.com", // primary hypergrid domain
     // "world2": "domain.com", // secondary hypergrid domain
     // "world3": "domain.com", // tertiary hypergrid domain
     // .. add more lines as required, separated by commas
@@ -102,7 +102,7 @@ var copyrightEndYear   = 0;
 // in to enable compatibility with the v2 code but it is better to use the proper UUID format with dashes retained.
 
 // default is "opensim", otherwise use "uuid" or "uuid-no-dashes" or "img" or "server"
-var filenames = "img";
+var filenames = "uuid-no-dashes";
 
 // For filenames "opensim"
 var robustport = 8002;
